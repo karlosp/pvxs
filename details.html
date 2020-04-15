@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Reporting a Bug &#8212; PVXS 0.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Examples" href="example.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reporting-a-bug">
+<span id="reportbug"></span><h1>Reporting a Bug<a class="headerlink" href="#reporting-a-bug" title="Permalink to this headline">¶</a></h1>
+<p>Before reporting a bug, please check to see if this issue has already been <a class="reference external" href="https://github.com/mdavidsaver/pvxs/issues">reported</a>.</p>
+<p>When composing a new report, please run the included automatic tests “make runtests” and mention the results.
+It is enough to mention “All tests successful.” if this is so.  (see <a class="reference internal" href="building.html#runtests"><span class="std std-ref">Running Tests</span></a>)</p>
+<p><a class="reference external" href="https://github.com/mdavidsaver/pvxs/issues">Bug reports</a> should always include:</p>
+<ul class="simple">
+<li>EPICS Base version or VCS commit</li>
+<li>PVXS module version or VCS commit</li>
+<li>libevent version or VCS commit (running “pvxget -V” shows these)</li>
+<li>EPICS host and target archs.  (eg. “linux-x86_64”)</li>
+<li>Host OS name and version (eg. run “cat /etc/issue”)</li>
+<li>Compiler name and version (eg. run “gcc –version”)</li>
+<li>The values of any $EPICS_PVA* environment variables which are set.</li>
+<li>Any local/site modifications to PVXS or libevent</li>
+<li>Concise instructions for reproducing the issue.</li>
+</ul>
+<p>Additional information which may be relevant:</p>
+<ul class="simple">
+<li>Number of network interfaces if more than one.</li>
+<li>Whether clients and/or servers are on the same host or diffrent hosts.</li>
+<li>Whether clients and/or servers are in the same subnet or different subnets</li>
+<li>Whether network traffic crosses between virtual machine(s) and physical host(s).</li>
+<li>Firewall rules on UDP traffic to/from port 5075 or TCP connections to port 5074</li>
+<li>Any local/site modifications to EPICS Base</li>
+</ul>
+</div>
+<div class="section" id="contributing">
+<span id="contrib"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>The recommended path for including changes is through [Pull Request](<a class="reference external" href="https://github.com/mdavidsaver/pvxs/pulls">https://github.com/mdavidsaver/pvxs/pulls</a>).</p>
+<p>When changing c++ code please do:</p>
+<ul class="simple">
+<li>Indent with 4 spaces.  No hard tabs.  UNIX style EoL.</li>
+<li>Try to maintain the style of surrounding code.</li>
+<li>Include meaningful code comments where reasonable.</li>
+</ul>
+<p>but do not:</p>
+<ul class="simple">
+<li>Add any c++ global constructors or destructors in the pvxs library.  (Ok in tools, examples, or tests)</li>
+</ul>
+<p>When committing changes please do:</p>
+<ul class="simple">
+<li>Include a commit message</li>
+<li>Break up changes into multiple commits where reasonable</li>
+<li>Include whitespace only changes as seperate commits</li>
+</ul>
+</div>
+<div class="section" id="notes">
+<h1>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h1>
+<p>Misc. notes on design and Implementation.</p>
+<ul class="simple">
+<li>All Server and client Context instances listening on the same UDP port# within a process
+will share a single UDP socket.</li>
+<li>The UDP local multicast fanout aspect of the PVA protocol is not implemented.</li>
+<li>Client UDP search retry follows a linear backoff starting from 1 second
+and stepping to 30 seconds.  cf. bucketInterval and nBuckets in client.cpp.</li>
+<li>To level UDP search traffic, search retry may delay a PV for an extra
+bucket if the difference in the number of PVs in the desired and subsequent
+buckets is too large.</li>
+<li>Client Context::hurryUp() expires the search bucket timer immediately,
+saving up to bucketInterval seconds.</li>
+<li>Each Value refers points to a pair of FieldDesc and FieldStorage in arrays
+of the same.  Value::operator[] steps around in these arrays.</li>
+<li>There is a hidden StructTop which holds the FieldStorage array and holds
+a shared_ptr to the FieldDesc array to join ownership of the two.</li>
+<li>TCP connection buffering will read up to tcp_readahead (cf. conn.h) bytes
+while waiting for a complete header.  After a header is received,
+the larger of tcp_readahead or the message body length is buffered.</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">PVXS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html#including-pvxs-in-your-application">Including PVXS in your application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="value.html">Value Container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server.html">Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="util.html">Misc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reporting a Bug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#contributing">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#notes">Notes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="example.html" title="previous chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020 Osprey DCS LLC.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/details.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
