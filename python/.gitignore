@@ -1,0 +1,7 @@
+*.pyc
+*.pyo
+*.cpp
+*.c
+*.so
+*.dylib
+*.dll

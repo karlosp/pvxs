@@ -1,0 +1,5 @@
+include pyproject.toml
+include python/pvxs/*.h
+include python/pvxs/*.cpp
+include python/pvxs/*.pyx
+include python/pvxs/*.pxd
